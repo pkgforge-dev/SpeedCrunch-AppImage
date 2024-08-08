@@ -17,7 +17,7 @@ jobs:
     - name: build
       run: |
         sudo apt update
-        sudo apt install libfuse2
+        sudo apt install libfuse2 desktop-file-utils
         wget https://raw.githubusercontent.com/Samueru-sama/SpeedCrunch-AppImage/main/speedcrunch-appimage.sh
         chmod a+x ./speedcrunch-appimage.sh
         ./speedcrunch-appimage.sh
