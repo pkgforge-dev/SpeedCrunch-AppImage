@@ -35,6 +35,6 @@ chmod a+x ./appimagetool
 # Do the thing!
 export VERSION="$(echo "$version" | awk -F"-" '{print $(NF-1)}')"
 export ARCH=x86_64
-./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 16 ./"$APP".AppDir SpeedCrunch-"$VERSION"-"$ARCH".AppImage
+./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 ./"$APP".AppDir SpeedCrunch-"$VERSION"-"$ARCH".AppImage
 [ -n "$APP" ] && mv ./*.AppImage .. && cd .. && rm -rf ./"$APP" || exit 1
 echo "All Done!"
