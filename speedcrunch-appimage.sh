@@ -38,5 +38,5 @@ export ARCH=x86_64
 ./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 \
   -u "gh-releases-zsync|Samueru-sama|SpeedCrunch-AppImage|continuous|*x86_64.AppImage.zsync" \
   ./"$APP".AppDir SpeedCrunch-"$VERSION"-"$ARCH".AppImage 
-[ -n "$APP" ] && mv ./*.AppImage .. && cd .. && rm -rf ./"$APP" || exit 1
+[ -n "$APP" ] && mv ./*.AppImage* .. && cd .. && rm -rf ./"$APP" || exit 1
 echo "All Done!"
