@@ -2,6 +2,8 @@
 set -u
 APP=speedcrunch
 SITE="heldercorreia/speedcrunch"
+export ARCH="$(uname -m)"
+APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
 
 # CREATE DIRECTORIES
 [ -n "$APP" ] && mkdir -p "./$APP/tmp" && cd "./$APP/tmp" || exit 1
@@ -18,24 +20,37 @@ DESKTOP="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54
 ICON="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/gfx/speedcrunch.svg"
 wget $DESKTOP -O ./$APP.desktop && wget $ICON -O ./org.speedcrunch.SpeedCrunch.png && ln -s ./$APP.png ./.DirIcon
 
+export VERSION="$(echo "$version" | awk -F"-" '{print $(NF-1)}')"
+
 # AppRun
 cat >> ./AppRun << 'EOF'
 #!/bin/sh
 CURRENTDIR="$(readlink -f "$(dirname "$0")")"
-exec "$CURRENTDIR"/usr/bin/speedcrunch "$@"
+export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
+exec "$CURRENTDIR/ld-linux-x86-64.so.2" \
+	--library-path "$CURRENTDIR/usr/lib" \
+	"$CURRENTDIR"/usr/bin/speedcrunch "$@"
 EOF
 chmod a+x ./AppRun
 
+# BUNDLE ALL LIBS
+mkdir -p ./usr/lib
+ldd ./usr/bin/speedcrunch | awk -F"[> ]" '{print $4}' | xargs -I {} cp -f {} ./usr/lib
+mv ./usr/lib/ld-linux-x86-64.so.2 ./
+
+if [ ! -f ./ld-linux-x86-64.so.2 ]; then
+  cp /lib64/ld-linux-x86-64.so.2 ./ || exit 1
+fi
+
+cp -r /usr/lib/gconv ./usr/lib/gconv || exit 1
+
 # MAKE APPIMAGE
 cd ..
-APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage"
 wget -q "$APPIMAGETOOL" -O ./appimagetool
-chmod a+x ./appimagetool
+chmod +x ./appimagetool
 
 # Do the thing!
-export VERSION="$(echo "$version" | awk -F"-" '{print $(NF-1)}')"
-export ARCH=x86_64
-./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 1 \
+./appimagetool --comp zstd --mksquashfs-opt -Xcompression-level --mksquashfs-opt 10 \
   -u "gh-releases-zsync|Samueru-sama|SpeedCrunch-AppImage|continuous|*x86_64.AppImage.zsync" \
   ./"$APP".AppDir SpeedCrunch-"$VERSION"-"$ARCH".AppImage 
 [ -n "$APP" ] && mv ./*.AppImage* .. && cd .. && rm -rf ./"$APP" || exit 1
