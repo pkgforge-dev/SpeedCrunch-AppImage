@@ -4,6 +4,7 @@ APP=speedcrunch
 SITE="heldercorreia/speedcrunch"
 export ARCH="$(uname -m)"
 APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-$ARCH.AppImage"
+export APPIMAGE_EXTRACT_AND_RUN=1
 
 # CREATE DIRECTORIES
 [ -n "$APP" ] && mkdir -p "./$APP/tmp" && cd "./$APP/tmp" || exit 1
