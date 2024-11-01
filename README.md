@@ -1,7 +1,7 @@
 # SpeedCrunch-AppImage
-Unofficial AppImage of the SpeedCrunch Calculator
+Unofficial AppImage of the SpeedCrunch Calculator, uses the [portable release](https://bitbucket.org/heldercorreia/speedcrunch/downloads/) of SpeedCrunch and turns it into an AppImage.
 
-Uses the portable release of SpeedCrunch and turns it into an AppImage: https://bitbucket.org/heldercorreia/speedcrunch/downloads/
+**This AppImage bundles everything and should work on any linux distro, even on musl based ones.**
 
 You can also run the `speedcrunch-appimage.sh` script in your machine to make the AppImage.
 
