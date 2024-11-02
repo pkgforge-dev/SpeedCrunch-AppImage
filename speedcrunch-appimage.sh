@@ -38,12 +38,12 @@ chmod a+x ./AppRun
 mkdir -p ./usr/lib
 ldd ./usr/bin/speedcrunch | awk -F"[> ]" '{print $4}' | xargs -I {} cp -f {} ./usr/lib
 mv ./usr/lib/ld-linux-x86-64.so.2 ./
-
 if [ ! -f ./ld-linux-x86-64.so.2 ]; then
   cp /lib64/ld-linux-x86-64.so.2 ./ || exit 1
 fi
-
 cp -r /usr/lib/gconv ./usr/lib/gconv || exit 1
+
+find ./usr/lib ./usr/bin -type f -exec strip -s -R .comment --strip-unneeded {} ';'
 
 # MAKE APPIMAGE
 cd ..
