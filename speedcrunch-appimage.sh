@@ -65,7 +65,7 @@ chmod +x ./appimagetool
 # Do the thing!
 ./appimagetool --comp zstd \
   --mksquashfs-opt -Xcompression-level --mksquashfs-opt 10 \
-  -n -u "$UPINFO" "$PWD"/"$APP".AppDir "$PWD"/"$APP"-"$VERSION"-anylinux-"$ARCH".AppImage
+  -n -u "$UPINFO" "$PWD"/AppDir "$PWD"/"$APP"-"$VERSION"-anylinux-"$ARCH".AppImage
 mv ./*.AppImage* ..
 cd ..
 rm -rf ./"$APP" || exit 1
