@@ -33,7 +33,7 @@ wget $DESKTOP -O ./$APP.desktop
 wget $ICON -O ./org.speedcrunch.SpeedCrunch.png
 ln -s ./org.speedcrunch.SpeedCrunch.png ./.DirIcon
 
-export VERSION="$(echo "$version" | awk -F"-" '{print $(NF-1)}')"
+export VERSION="$(echo "$APP_URL" | awk -F"-" '{print $(NF-1)}')"
 
 # AppRun
 cat >> ./AppRun << 'EOF'
