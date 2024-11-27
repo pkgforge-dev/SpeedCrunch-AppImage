@@ -12,6 +12,7 @@ APPIMAGETOOL="https://github.com/AppImage/appimagetool/releases/download/continu
 
 DESKTOP="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/pkg/org.speedcrunch.SpeedCrunch.desktop"
 ICON="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/gfx/speedcrunch.svg"
+DARKTHEME="https://raw.githubusercontent.com/pkgforge-dev/SpeedCrunch-AppImage/refs/heads/main/dark.stylesheet"
 
 # CREATE DIRECTORIES
 mkdir -p "./$APP/tmp"
@@ -29,11 +30,14 @@ mv ./tmp/* ./AppDir/usr/bin
 cd ./AppDir
 
 # DESKTOP ENTRY AND ICON
-wget $DESKTOP -O ./$APP.desktop
-wget $ICON -O ./org.speedcrunch.SpeedCrunch.png
+wget "$DESKTOP" -O ./"$APP".desktop
+wget "$ICON" -O ./org.speedcrunch.SpeedCrunch.png
 ln -s ./org.speedcrunch.SpeedCrunch.png ./.DirIcon
 
 export VERSION="$(echo "$APP_URL" | awk -F"-" '{print $(NF-1)}')"
+
+# Get dark theme stylesheet
+wget "$DARKTHEME" -O ./dark.stylesheet
 
 # AppRun
 cat >> ./AppRun << 'EOF'
@@ -42,7 +46,8 @@ CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
 exec "$CURRENTDIR/ld-linux-x86-64.so.2" \
 	--library-path "$CURRENTDIR/usr/lib" \
-	"$CURRENTDIR"/usr/bin/speedcrunch "$@"
+	"$CURRENTDIR"/usr/bin/speedcrunch "$@" \
+	-stylesheet "$CURRENTDIR"/dark.stylesheet
 EOF
 chmod +x ./AppRun
 
