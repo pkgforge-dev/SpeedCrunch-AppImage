@@ -36,18 +36,16 @@ ln -s ./org.speedcrunch.SpeedCrunch.png ./.DirIcon
 
 export VERSION="$(echo "$APP_URL" | awk -F"-" '{print $(NF-1)}')"
 
-# Get dark theme stylesheet
-wget "$DARKTHEME" -O ./dark.stylesheet
-
 # AppRun
 cat >> ./AppRun << 'EOF'
 #!/usr/bin/env sh
 CURRENTDIR="$(readlink -f "$(dirname "$0")")"
 export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
+[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
+[ -f "$APPIMAGE_QT_THEME" ] && set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
 exec "$CURRENTDIR/ld-linux-x86-64.so.2" \
 	--library-path "$CURRENTDIR/usr/lib" \
-	"$CURRENTDIR"/usr/bin/speedcrunch "$@" \
-	-stylesheet "$CURRENTDIR"/dark.stylesheet
+	"$CURRENTDIR"/usr/bin/speedcrunch "$@"
 EOF
 chmod +x ./AppRun
 
