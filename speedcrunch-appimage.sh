@@ -66,8 +66,8 @@ wget -q "$APPIMAGETOOL" -O ./appimagetool
 chmod +x ./appimagetool
 
 # Do the thing!
-./appimagetool --comp zstd \
-  --mksquashfs-opt -Xcompression-level --mksquashfs-opt 10 \
+URUNTIME_PRELOAD=1 ./appimagetool --comp zstd \
+  --mksquashfs-opt -Xcompression-level --mksquashfs-opt 22 \
   -n -u "$UPINFO" "$PWD"/AppDir "$PWD"/"$APP"-"$VERSION"-anylinux-"$ARCH".AppImage
 mv ./*.AppImage* ..
 cd ..
