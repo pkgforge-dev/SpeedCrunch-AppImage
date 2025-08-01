@@ -1,75 +1,100 @@
 #!/bin/sh
 
-set -eu
+set -ex
 
-export ARCH="$(uname -m)"
-export APPIMAGE_EXTRACT_AND_RUN=1
+ARCH="$(uname -m)"
+VERSION=0.12
+TARBALL="https://bitbucket.org/heldercorreia/speedcrunch/downloads/SpeedCrunch-$VERSION-linux64.tar.bz2"
 
-APP=SpeedCrunch
-SITE="heldercorreia/speedcrunch"
-UPINFO="gh-releases-zsync|$(echo $GITHUB_REPOSITORY | tr '/' '|')|continuous|*$ARCH.AppImage.zsync"
-APPIMAGETOOL="https://github.com/pkgforge-dev/appimagetool-uruntime/releases/download/continuous/appimagetool-$ARCH.AppImage"
+ARCH="$(uname -m)"
+URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-$ARCH"
+URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-lite-$ARCH"
+SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
+UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
 
 DESKTOP="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/pkg/org.speedcrunch.SpeedCrunch.desktop"
 ICON="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/gfx/speedcrunch.svg"
-DARKTHEME="https://raw.githubusercontent.com/pkgforge-dev/SpeedCrunch-AppImage/refs/heads/main/dark.stylesheet"
+
 
 # CREATE DIRECTORIES
-mkdir -p "./$APP/tmp"
-cd "./$APP/tmp"
+mkdir -p ./AppDir/shared/bin && (
+	cd ./AppDir
+	wget --retry-connrefused --tries=30 "$TARBALL" -O ./speedcrunch.tar.bz2
+	tar xvf ./speedcrunch.tar.bz2
+	rm -f   ./speedcrunch.tar.bz2
+	mv -v   ./speedcrunch  ./shared/bin
 
-# DOWNLOAD AND EXTRACT THE ARCHIVE
-APP_URL=$(curl -Ls https://api.bitbucket.org/2.0/repositories/"$SITE"/downloads \
-  | sed 's/[()",{} ]/\n/g' | grep -o 'https.*SpeedCrunch.*64.*bz2$' | head -1)
-wget "$APP_URL"
-tar fx ./*.tar.*
-rm -f ./*.tar.*
-cd ..
-mkdir -p ./AppDir/usr/bin
-mv ./tmp/* ./AppDir/usr/bin
-cd ./AppDir
+	# Add desktop and icon
+	wget --retry-connrefused --tries=30 "$DESKTOP" -O  ./speedcrunch.desktop
+	wget --retry-connrefused --tries=30 "$ICON"    -O  ./speedcrunch.png
+	cp -v ./speedcrunch.png ./.DirIcon
 
-# DESKTOP ENTRY AND ICON
-wget "$DESKTOP" -O ./"$APP".desktop
-wget "$ICON" -O ./org.speedcrunch.SpeedCrunch.png
-ln -s ./org.speedcrunch.SpeedCrunch.png ./.DirIcon
+	# deploy libs
+	wget --retry-connrefused --tries=30 "$SHARUN" -O ./sharun-aio
+	chmod +x ./sharun-aio
+	xvfb-run -a -- \
+		./sharun-aio l -p -v -e -s -k \
+			./shared/bin/speedcrunch \
+			/usr/lib/gconv/*
+	rm -f ./sharun-aio
 
-export VERSION="$(echo "$APP_URL" | awk -F"-" '{print $(NF-1)}')"
+	cat <<-'EOF' >> ./AppRun
+	#!/bin/sh
+	CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
+	export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
+	[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
+	[ -f "$APPIMAGE_QT_THEME" ] && set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
+	exec "$CURRENTDIR"/bin/speedcrunch "$@"
+	EOF
+	chmod +x ./AppRun
 
-# AppRun
-cat >> ./AppRun << 'EOF'
-#!/usr/bin/env sh
-CURRENTDIR="$(readlink -f "$(dirname "$0")")"
-export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
-[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
-[ -f "$APPIMAGE_QT_THEME" ] && set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
-exec "$CURRENTDIR/ld-linux-x86-64.so.2" \
-	--library-path "$CURRENTDIR/usr/lib" \
-	"$CURRENTDIR"/usr/bin/speedcrunch "$@"
-EOF
-chmod +x ./AppRun
+	# prepare sharun
+	./sharun -g
+)
 
-# BUNDLE ALL LIBS
-mkdir -p ./usr/lib
-ldd ./usr/bin/speedcrunch | awk -F"[> ]" '{print $4}' | xargs -I {} cp -vf {} ./usr/lib
-mv ./usr/lib/ld-linux-x86-64.so.2 ./ || true
-if [ ! -f ./ld-linux-x86-64.so.2 ]; then
-  cp /lib64/ld-linux-x86-64.so.2 ./
-fi
-cp -rv /usr/lib/gconv ./usr/lib/gconv
+[ -n "$VERSION" ] && echo "$VERSION" > ~/version
 
-find ./usr/lib ./usr/bin -type f -exec strip -s -R .comment --strip-unneeded {} ';'
+# MAKE APPIMAGE WITH URUNTIME
+wget --retry-connrefused --tries=30 "$URUNTIME"      -O  ./uruntime
+wget --retry-connrefused --tries=30 "$URUNTIME_LITE" -O  ./uruntime-lite
+chmod +x ./uruntime*
 
-# MAKE APPIMAGE
-cd ..
-wget -q "$APPIMAGETOOL" -O ./appimagetool
-chmod +x ./appimagetool
+# Keep the mount point (speeds up launch time)
+sed -i 's|URUNTIME_MOUNT=[0-9]|URUNTIME_MOUNT=0|' ./uruntime-lite
 
-# Do the thing!
-URUNTIME_PRELOAD=1 ./appimagetool --comp zstd \
-  --mksquashfs-opt -Xcompression-level --mksquashfs-opt 22 \
-  -n -u "$UPINFO" "$PWD"/AppDir "$PWD"/"$APP"-"$VERSION"-anylinux-"$ARCH".AppImage
-mv ./*.AppImage* ..
-cd ..
-rm -rf ./"$APP" || exit 1
+# Add udpate info to runtime
+echo "Adding update information \"$UPINFO\" to runtime..."
+./uruntime-lite --appimage-addupdinfo "$UPINFO"
+
+echo "Generating AppImage..."
+./uruntime \
+	--appimage-mkdwarfs -f               \
+	--set-owner 0 --set-group 0          \
+	--no-history --no-create-timestamp   \
+	--compression zstd:level=22 -S26 -B8 \
+	--header uruntime-lite               \
+	-i ./AppDir                          \
+	-o ./SpeedCrunch-"$VERSION"-anylinux-"$ARCH".AppImage
+
+# make appbundle
+UPINFO="$(echo "$UPINFO" | sed 's#.AppImage.zsync#*.AppBundle.zsync#g')"
+wget --retry-connrefused --tries=30 \
+	"https://github.com/xplshn/pelf/releases/latest/download/pelf_$ARCH" -O ./pelf
+chmod +x ./pelf
+echo "Generating [dwfs]AppBundle..."
+./pelf \
+	--compression "-C zstd:level=22 -S26 -B8"      \
+	--appbundle-id="SpeedCrunch-$VERSION"            \
+	--appimage-compat --disable-use-random-workdir \
+	--add-updinfo "$UPINFO"                        \
+	--add-appdir ./AppDir                          \
+	--output-to ./SpeedCrunch-"$VERSION"-anylinux-"$ARCH".dwfs.AppBundle
+
+zsyncmake ./*.AppImage -u  ./*.AppImage
+zsyncmake ./*.AppBundle -u ./*.AppBundle
+
+mkdir -p ./dist
+mv -v ./*.AppImage*  ./dist
+mv -v ./*.AppBundle* ./dist
+
 echo "All Done!"
