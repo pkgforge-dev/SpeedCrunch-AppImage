@@ -41,7 +41,6 @@ mkdir -p ./AppDir/shared/bin && (
 	cat <<-'EOF' >> ./AppRun
 	#!/bin/sh
 	CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
-	export GCONV_PATH="$CURRENTDIR/usr/lib/gconv"
 	[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
 	[ -f "$APPIMAGE_QT_THEME" ] && set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
 	exec "$CURRENTDIR"/bin/speedcrunch "$@"
