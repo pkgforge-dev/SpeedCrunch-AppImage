@@ -1,10 +1,32 @@
-# SpeedCrunch-AppImage
-Unofficial AppImage of the SpeedCrunch Calculator, uses the [portable release](https://bitbucket.org/heldercorreia/speedcrunch/downloads/) of SpeedCrunch and turns it into an AppImage.
+# SpeedCrunch-AppImage 🐧
+
+[![GitHub Downloads](https://img.shields.io/github/downloads/pkgforge-dev/speedcrunch-AppImage/total?logo=github&label=GitHub%20Downloads)](https://github.com/pkgforge-dev/speedcrunch-AppImage/releases/latest)
+[![CI Build Status](https://github.com//pkgforge-dev/speedcrunch-AppImage/actions/workflows/blank.yml/badge.svg)](https://github.com/pkgforge-dev/speedcrunch-AppImage/releases/latest)
+
+* [Latest Stable Release](https://github.com/pkgforge-dev/speedcrunch-AppImage/releases/latest)
+
+---
+
+AppImage made using [sharun](https://github.com/VHSgunzo/sharun), which makes it extremely easy to turn any binary into a portable package without using containers or similar tricks.
 
 **This AppImage bundles everything and should work on any linux distro, even on musl based ones.**
 
-You can also run the `speedcrunch-appimage.sh` script in your machine to make the AppImage.
+It is possible that this appimage may fail to work with appimagelauncher, I recommend these alternatives instead: 
 
-It is possible that this appimage may fail to work with appimagelauncher, I recommend this alternative instead: https://github.com/ivan-hc/AM
+* [AM](https://github.com/ivan-hc/AM) `am -i speedcrunch` or `appman -i speedcrunch`
 
-This appimage works without `fuse2` as it can use `fuse3` instead.
+* [dbin](https://github.com/xplshn/dbin) `dbin install speedcrunch.appimage`
+
+* [soar](https://github.com/pkgforge/soar) `soar install speedcrunch`
+
+This appimage works without fuse2 as it can use fuse3 instead, it can also work without fuse at all thanks to the [uruntime](https://github.com/VHSgunzo/uruntime)
+
+<details>
+  <summary><b><i>raison d'être</i></b></summary>
+    <img src="https://github.com/user-attachments/assets/d40067a6-37d2-4784-927c-2c7f7cc6104b" alt="Inspiration Image">
+  </a>
+</details>
+
+---
+
+More at: [AnyLinux-AppImages](https://pkgforge-dev.github.io/Anylinux-AppImages/) 
