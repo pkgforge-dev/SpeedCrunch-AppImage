@@ -42,7 +42,7 @@ mkdir -p ./AppDir/shared/bin && (
 			/usr/lib/gconv/CP*
 	rm -f ./sharun-aio
 
-	cat <<-'EOF' >> ./AppRun
+	cat <<-'EOF' > ./AppRun
 	#!/bin/sh
 	CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
 	[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
@@ -87,7 +87,7 @@ chmod +x ./pelf
 echo "Generating [dwfs]AppBundle..."
 ./pelf \
 	--compression "-C zstd:level=22 -S26 -B8"      \
-	--appbundle-id="SpeedCrunch-$VERSION"            \
+	--appbundle-id="SpeedCrunch-$VERSION"          \
 	--appimage-compat --disable-use-random-workdir \
 	--add-updinfo "$UPINFO"                        \
 	--add-appdir ./AppDir                          \
