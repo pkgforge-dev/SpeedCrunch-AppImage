@@ -35,7 +35,11 @@ mkdir -p ./AppDir/shared/bin && (
 	xvfb-run -a -- \
 		./sharun-aio l -p -v -e -s -k \
 			./shared/bin/speedcrunch \
-			/usr/lib/gconv/*
+			/usr/lib/gconv/UTF*      \
+			/usr/lib/gconv/UNICODE*  \
+			/usr/lib/gconv/LATIN*    \
+			/usr/lib/gconv/ANSI*     \
+			/usr/lib/gconv/CP*
 	rm -f ./sharun-aio
 
 	cat <<-'EOF' >> ./AppRun
