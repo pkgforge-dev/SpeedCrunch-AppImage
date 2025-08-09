@@ -11,6 +11,7 @@ URUNTIME="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime
 URUNTIME_LITE="https://github.com/VHSgunzo/uruntime/releases/latest/download/uruntime-appimage-dwarfs-lite-$ARCH"
 SHARUN="https://github.com/VHSgunzo/sharun/releases/latest/download/sharun-$ARCH-aio"
 UPINFO="gh-releases-zsync|$(echo "$GITHUB_REPOSITORY" | tr '/' '|')|latest|*$ARCH.AppImage.zsync"
+APPRUN="https://raw.githubusercontent.com/pkgforge-dev/Anylinux-AppImages/refs/heads/udev-rules/useful-tools/AppRun-Qt"
 
 DESKTOP="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/pkg/org.speedcrunch.SpeedCrunch.desktop"
 ICON="https://bitbucket.org/heldercorreia/speedcrunch/raw/fa4f5d23f28b6458b54c617230f66af41fc94d7e/gfx/speedcrunch.svg"
@@ -42,13 +43,7 @@ mkdir -p ./AppDir/shared/bin && (
 			/usr/lib/gconv/CP*
 	rm -f ./sharun-aio
 
-	cat <<-'EOF' > ./AppRun
-	#!/bin/sh
-	CURRENTDIR="$(cd "${0%/*}" && echo "$PWD")"
-	[ -f "$APPIMAGE".stylesheet ] && APPIMAGE_QT_THEME="$APPIMAGE.stylesheet"
-	[ -f "$APPIMAGE_QT_THEME" ] && set -- "$@" "-stylesheet" "$APPIMAGE_QT_THEME"
-	exec "$CURRENTDIR"/bin/speedcrunch "$@"
-	EOF
+	wget --retry-connrefused --tries=30 "$APPRUN" -O ./AppRun
 	chmod +x ./AppRun
 
 	# prepare sharun
