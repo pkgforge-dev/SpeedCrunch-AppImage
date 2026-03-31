@@ -1,35 +1,26 @@
 #!/bin/sh
 
-set -eux
+set -eu
 
-ARCH="$(uname -m)"
-case "$ARCH" in
-	'x86_64')  PKG_TYPE='x86_64.pkg.tar.zst';;
-	'aarch64') PKG_TYPE='aarch64.pkg.tar.xz';;
-	''|*) echo "Unknown arch: $ARCH"; exit 1;;
-esac
+ARCH=$(uname -m)
 
-echo "Installing build dependencies..."
+echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
-pacman -Syu --noconfirm \
-	base-devel        \
-	curl              \
-	fontconfig        \
-	freetype2         \
-	git               \
-	libxcb            \
-	libxcursor        \
-	libxi             \
-	libxkbcommon      \
-	libxkbcommon-x11  \
-	libxrandr         \
-	libxtst           \
-	ncurses           \
-	patch             \
-	pulseaudio        \
-	wget              \
-	xorg-server-xvfb  \
-	zsync
+# pacman -Syu --noconfirm PACKAGESHERE
 
-echo "All done!"
+echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
+get-debloated-pkgs --add-common --prefer-nano ! mesa ! vulkan
+
+# Comment this out if you need an AUR package
+#make-aur-package PACKAGENAME
+
+echo "Getting binary..."
+echo "---------------------------------------------------------------"
+VERSION=0.12
+echo "$VERSION" > ~/version
+TARBALL=https://bitbucket.org/heldercorreia/speedcrunch/downloads/SpeedCrunch-$VERSION-linux64.tar.bz2
+wget --retry-connrefused --tries=30 "$TARBALL" -O /tmp/speedcrunch.tar.bz2
+mkdir -p ./AppDir/bin
+tar xvf /tmp/speedcrunch.tar.bz2
+mv -v ./speedcrunch  ./AppDir/bin
