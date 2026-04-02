@@ -12,7 +12,7 @@ export DESKTOP=https://bitbucket.org/heldercorreia/speedcrunch/raw/68c00cbe3fc3d
 export ALWAYS_SOFTWARE=1
 
 # Deploy dependencies
-quick-sharun ./AppDir/bin/*
+quick-sharun ./AppDir/bin/* /usr/share/X11/xkb /usr/share/X11/locale
 
 # Additional changes can be done in between here
 
