@@ -7,12 +7,12 @@ export ARCH
 export OUTPATH=./dist
 export ADD_HOOKS="self-updater.hook:qt-theme.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export ICON=https://bitbucket.org/heldercorreia/speedcrunch/raw/68c00cbe3fc3d493c76d4d2d2a240e0e8c839778/gfx/speedcrunch.svg
-export DESKTOP=https://bitbucket.org/heldercorreia/speedcrunch/raw/68c00cbe3fc3d493c76d4d2d2a240e0e8c839778/pkg/org.speedcrunch.SpeedCrunch.desktop
+export ICON=/usr/share/pixmaps/org.speedcrunch.SpeedCrunch.png
+export DESKTOP=/usr/share/applications/org.speedcrunch.SpeedCrunch.desktop
 export ALWAYS_SOFTWARE=1
 
 # Deploy dependencies
-quick-sharun ./AppDir/bin/* /usr/share/X11/xkb /usr/share/X11/locale
+quick-sharun /usr/bin/speedcrunch
 
 # Additional changes can be done in between here
 
@@ -22,4 +22,3 @@ quick-sharun --make-appimage
 # Test the app for 12 seconds, if the test fails due to the app
 # having issues running in the CI use --simple-test instead
 quick-sharun --test ./dist/*.AppImage
-

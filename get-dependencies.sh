@@ -6,21 +6,31 @@ ARCH=$(uname -m)
 
 echo "Installing package dependencies..."
 echo "---------------------------------------------------------------"
-# pacman -Syu --noconfirm PACKAGESHERE
+pacman -Syu --noconfirm cmake qt6-tools
 
 echo "Installing debloated packages..."
 echo "---------------------------------------------------------------"
 get-debloated-pkgs --add-common --prefer-nano ! mesa ! vulkan
 
-# Comment this out if you need an AUR package
-#make-aur-package PACKAGENAME
+# If the application needs to be manually built that has to be done down here
 
-echo "Getting binary..."
+# speedcrunch's tags are still on Qt5 (0.12), no Qt6 tag exists yet
+# so this will fail to build until upstream tags a version that works with Qt
+# TODO remove this once upstream makes a new tag that builds with Qt6!
+exit 1
+
+echo "Building speedcrunch..."
 echo "---------------------------------------------------------------"
-VERSION=0.12
-echo "$VERSION" > ~/version
-TARBALL=https://bitbucket.org/heldercorreia/speedcrunch/downloads/SpeedCrunch-$VERSION-linux64.tar.bz2
-wget --retry-connrefused --tries=30 "$TARBALL" -O /tmp/speedcrunch.tar.bz2
-mkdir -p ./AppDir/bin
-tar xvf /tmp/speedcrunch.tar.bz2
-mv -v ./speedcrunch  ./AppDir/bin
+git clone https://bitbucket.org/heldercorreia/speedcrunch ./speedcrunch && (
+	cd ./speedcrunch
+6
+	git fetch --tags origin
+	TAG=$(git tag --sort=-v:refname | grep -vi 'preview\|alpha\|beta' | head -1)
+	git checkout "$TAG"
+
+	cmake -S ./src -B ./build -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr
+	cmake --build ./build
+	cmake --install ./build
+
+	echo "$TAG" > ~/version
+)
