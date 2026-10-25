@@ -15,7 +15,7 @@ get-debloated-pkgs --add-common --prefer-nano ! mesa ! vulkan
 # If the application needs to be manually built that has to be done down here
 echo "Building speedcrunch..."
 echo "---------------------------------------------------------------"
-git clone https://bitbucket.org/heldercorreia/speedcrunch ./speedcrunch && (
+git clone https://github.com/heldercorreia/speedcrunch ./speedcrunch && (
 	cd ./speedcrunch
 
 	git fetch --tags origin
