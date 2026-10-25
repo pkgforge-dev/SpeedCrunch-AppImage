@@ -7,7 +7,7 @@ export ARCH
 export OUTPATH=./dist
 export ADD_HOOKS="self-updater.hook:qt-theme.hook"
 export UPINFO="gh-releases-zsync|${GITHUB_REPOSITORY%/*}|${GITHUB_REPOSITORY#*/}|latest|*$ARCH.AppImage.zsync"
-export ICON=/usr/share/pixmaps/org.speedcrunch.SpeedCrunch.png
+export ICON=/usr/share/icons/hicolor/256x256/apps/org.speedcrunch.SpeedCrunch.png
 export DESKTOP=/usr/share/applications/org.speedcrunch.SpeedCrunch.desktop
 export ALWAYS_SOFTWARE=1
 
